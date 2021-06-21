@@ -1,3 +1,21 @@
+class Process:
+    def __init__(self, allocate, max):
+        self.allocate: [] = allocate
+        self.max: [] = max
+        self.required: [] = []
+        self.is_executable: bool = False
+        self.has_already_executed: bool = False
+
+    # TODO: fazer um do while, marca todos os executaveis, e dps executar os possiveis, verificar novamente com o
+    # novo estado do banco, e o while acaba ao nao ter mais executaveis ou nao houver processos sem ser executados antes.
+
+
+class Bank:
+    def __init__(self, available, processes):
+        self.available: [] = available
+        self.processes: [Process] = processes
+
+
 def process_required_matrix(allocate, max, available):
     matrix_required = []
     count_process = len(allocate)
