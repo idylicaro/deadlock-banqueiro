@@ -1,8 +1,11 @@
+import copy
+
+
 class Process:
-    def __init__(self, allocate, max):
+    def __init__(self, allocate, max, required):
         self.allocate: [] = allocate
         self.max: [] = max
-        self.required: [] = []
+        self.required: [] = required
         self.is_executable: bool = False
         self.has_already_executed: bool = False
 
@@ -11,9 +14,64 @@ class Process:
 
 
 class Bank:
-    def __init__(self, available, processes):
+    def __init__(self, available, processes=None):
+        if processes is None:
+            processes = []
         self.available: [] = available
         self.processes: [Process] = processes
+
+    def load_processes_and_calculate_required(self, allocate, max):
+        for i in range(0, len(allocate), 1):
+            aux_allocate = []
+            aux_max = []
+            aux_required = []
+            for j in range(0, len(self.available), 1):
+                aux_allocate.append(int(allocate[i][j]))
+                aux_max.append(int(max[i][j]))
+                aux_required.append(int(max[i][j]) - int(allocate[i][j]))
+            self.processes.append(Process(aux_allocate, aux_max, aux_required))
+
+    def is_security_state(self):
+        aux_process: [Process] = copy.deepcopy(self.processes)
+        aux_available = copy.deepcopy(self.available)
+
+        for p in aux_process:
+            notIsminor = False
+            for i in range(0, len(self.available), 1):
+                notIsminor = not p.required[i] <= int(self.available[i])
+            if not notIsminor:
+                p.is_executable = True
+
+        has_some_execution = None
+        aux_count = 0
+        while has_some_execution != False:
+            if aux_count == 0:
+                has_some_execution = False
+
+            for p in aux_process:
+                if (p.has_already_executed or not p.is_executable):
+                    continue
+                notIsminor = False
+                for i in range(0, len(self.available), 1):
+                    notIsminor = not p.required[i] <= int(self.available[i])
+                if not notIsminor:
+                    p.has_already_executed = True
+                    for x in range(0, len(self.available), 1):
+                        aux_available[x] = int(aux_available[x]) + p.allocate[x]
+
+            if not aux_count < len(self.processes):
+                aux_count = 0
+
+        is_security = True
+        for p in aux_process:
+            if not p.has_already_executed:
+                is_security = False
+                return False
+
+        # for y in aux_process:
+        #     print('aux_process:', y.has_already_executed)
+        # print('aux_available:', aux_available)
+        return True
 
 
 def process_required_matrix(allocate, max, available):
@@ -51,8 +109,13 @@ def main():
             vector_available = data
 
     archive.close()
-    result = process_required_matrix(matrix_allocate, matrix_max, vector_available)
-    print(result)
+    bank = Bank(vector_available)
+    bank.load_processes_and_calculate_required(matrix_allocate, matrix_max)
+
+    print('\nRequired:')
+    for i in bank.processes:
+        print(i.required)
+    print('\nIs_security:', bank.is_security_state())
 
 
 if __name__ == "__main__":
