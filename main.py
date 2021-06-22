@@ -87,19 +87,6 @@ class Bank:
 
         return aux_bank.is_security_state()
 
-def process_required_matrix(allocate, max, available):
-    matrix_required = []
-    count_process = len(allocate)
-    count_resource = len(available)
-    for i in range(0, count_process, 1):
-        aux_resource = []
-        for j in range(0, count_resource, 1):
-            aux_resource.append(int(max[i][j]) - int(allocate[i][j]))
-        matrix_required.append(aux_resource)
-
-    return matrix_required
-
-
 def main():
     archive = open('test.txt', 'r')
 
