@@ -73,6 +73,19 @@ class Bank:
         # print('aux_available:', aux_available)
         return True
 
+    def request(self, id_p, resource):
+        # dont change the bank directly
+        aux_bank:Bank = copy.deepcopy(self)
+
+        for i in range(0, len(resource), 1):
+            if (int(aux_bank.available[i]) - resource[i] ) < 0:
+                return False
+            aux_bank.available[i] = int(aux_bank.available[i]) - resource[i]
+
+        for i in range(0, len(aux_bank.processes[id_p].allocate), 1):
+            aux_bank.processes[id_p].allocate[i] += resource[i]
+
+        return aux_bank.is_security_state()
 
 def process_required_matrix(allocate, max, available):
     matrix_required = []
@@ -116,6 +129,8 @@ def main():
     for i in bank.processes:
         print(i.required)
     print('\nIs_security:', bank.is_security_state())
+    print('\nIs_security after request:', bank.request(0, [1, 0, 0, 0]))
+
 
 
 if __name__ == "__main__":
